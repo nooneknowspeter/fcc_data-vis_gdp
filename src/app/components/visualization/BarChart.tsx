@@ -1,42 +1,105 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import * as d3 from "d3";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
+import axios from "axios";
 
 //npm i --save-dev @types/d3
 
 const BarChart = () => {
-  const data = [5000, 50000, 500, 6000, 4050, 3050, 200];
-  const width = 640;
-  const height = 400;
-  const marginTop = 20;
-  const marginRight = 20;
-  const marginBottom = 30;
-  const marginLeft = 40;
+  // http request json with axios
+  const [data, setData] = useState([[]]);
 
-  const gx = useRef<SVGGElement>(null);
-  const gy = useRef<SVGGElement>(null);
+  const url: string =
+    "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json";
 
-  // x scale
-  const x = d3.scaleLinear(
-    [0, data.length - 1],
-    [marginLeft, width - marginRight],
-  );
+  const fetchData = async () => {
+    const response = await axios.get(url);
+    return response.data;
+  };
 
-  // y scale
-  const y = d3.scaleLinear(
-    [0, d3.max(data)],
-    [height - marginBottom, marginTop],
-  );
+  // data fetches when component mounts
+  useEffect(() => {
+    const fetchDataAsync = async () => {
+      const data = await fetchData();
+      setData(data.data);
+    };
+    fetchDataAsync();
+  }, []);
 
-  const line = d3.line((d, i) => x(i), y);
+  const width = 928;
+  const height = 500;
 
   useEffect(() => {
-    if (gx.current) d3.select(gx.current).call(d3.axisBottom(x));
-  }, [gx, x]);
+    createBarChart();
+  });
 
-  useEffect(() => {
-    if (gx.current) d3.select(gy.current).call(d3.axisLeft(y));
-  }, [gy, y]);
+  const createBarChart = () => {
+    // margin
+    const marginTop = 30;
+    const marginRight = 40;
+    const marginBottom = 30;
+    const marginLeft = 40;
+
+    // select svg element
+    const svg = d3.select("svg");
+
+    // console.log(data[0][1])
+
+    // Declare the x (horizontal position) scale.
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, (d, i) => i)])
+      .range([marginLeft, width - marginRight]);
+
+    // Declare the y (vertical position) scale.
+    const yScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, (d) => d[1])])
+      .range([height - marginBottom, marginTop]);
+
+    // Add a rect for each bar.
+    svg
+      .append("g")
+      .selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("x", (d, i) => {
+        let p = i * 1;
+        console.log("index: ", i);
+        console.log("position, x: ", p);
+        return xScale(p);
+      })
+      .attr("fill", "white")
+      .attr("y", (d) => yScale(d[1]))
+      .attr("height", (d) => yScale(0) - yScale(d[1]))
+      .attr("width", 5)
+      .attr("class", "bar");
+
+    // // Add the x-axis and label.
+    // svg
+    //   .append("g")
+    //   .attr("transform", `translate(0,${height - marginBottom})`)
+    //   .call(d3.axisBottom(x).tickSizeOuter(0));
+
+    // // Add the y-axis and label, and remove the domain line.
+    // svg
+    //   .append("g")
+    //   .attr("transform", `translate(${marginLeft},0)`)
+    //   .call(d3.axisLeft(y).tickFormat((y) => (y * 100).toFixed()))
+    //   .call((g) => g.select(".domain").remove())
+    //   .call((g) =>
+    //     g
+    //       .append("text")
+    //       .attr("x", -marginLeft)
+    //       .attr("y", 10)
+    //       .attr("fill", "currentColor")
+    //       .attr("text-anchor", "start")
+    //       .text("↑ Frequency (%)"),
+    //   );
+  };
 
   return (
     <>
@@ -47,25 +110,7 @@ const BarChart = () => {
         >
           Chart Showing United States GDP 1947 - 2015
         </h1>
-        <svg width={width} height={height}>
-          <g
-            ref={gx}
-            transform={`translate(0,${height - marginBottom})`}
-            id="x-axis"
-          />
-          <g ref={gy} transform={`translate(${marginLeft},0)`} id="y-axis" />
-          <path
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            d={line(data) || ""}
-          />
-          <g fill="white" stroke="currentColor" strokeWidth="1.5">
-            {data.map((d, i) => (
-              <circle key={i} cx={x(i)} cy={y(d)} r="2.5" />
-            ))}
-          </g>
-        </svg>
+        <svg id="bar-chart" width={width} height={height}></svg>
         <a
           className="text-sm text-neutral-900 dark:text-neutral-200"
           href="https://fred.stlouisfed.org/"
