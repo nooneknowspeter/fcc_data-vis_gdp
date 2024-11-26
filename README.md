@@ -7,6 +7,7 @@
 ## Tech Stack / Softwares
 
 - [Axios](https://axios-http.com/docs/intro)
+- [D3js](https://d3js.org/what-is-d3)
 - [Git](https://git-scm.com/)
 - [GitHub](https://github.com/)
 - [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site)
