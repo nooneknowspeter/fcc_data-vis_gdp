@@ -1,4 +1,4 @@
-# Data Vis
+# Visualize Data with a Bar Chart
 
 ## Objective
 
