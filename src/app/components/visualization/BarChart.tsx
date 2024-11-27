@@ -173,11 +173,41 @@ const BarChart = () => {
     // )
 
     // tooltips
-    d3.select("body").append("div").attr("className", "bg-neutral-50 ");
+    const tooltip = d3
+      .select("div")
+      .append("div")
+      .attr("class", "tooltip absolute tooltip-open origin-center")
+      .attr("data-theme", "black")
+      .style("opacity", 0);
 
-    d3.selectAll("rect").on("mouseover", (event, d) => {
-      console.log(event, d);
-    });
+    d3.selectAll("rect")
+      .on("mouseover", (event, d, i) => {
+        // console.log("x", event.x, "y", event.y);
+
+        // const x = event.x;
+
+        tooltip.transition().duration(500).style("opacity", 0.9);
+        tooltip
+          .attr("data-tip", `${d[0]}, ${d[1]} Billion`)
+          .attr("data-date", () => {
+            const date = d[0];
+            // console.log("date", date);
+            return date;
+          })
+          .attr("data-gdp", () => {
+            const gdp = d[1];
+            // console.log("gdp", gdp);
+            return gdp;
+          });
+        //   .style("transform", `translateY(${event.y - width / 1.5}px)`)
+        //   .style("transform", `translateX(${x}px)`);
+        // console.log(x);
+        // console.log("innerWidth", innerWidth);
+        // console.log("width", width);
+      })
+      .on("mouseout", function () {
+        tooltip.transition().duration(500).style("opacity", 0);
+      });
   };
 
   return (
@@ -189,7 +219,6 @@ const BarChart = () => {
         >
           Bar Chart Showing United States GDP 1947 - 2015
         </h1>
-
         <svg id="bar-chart" width={width} height={height}></svg>
         <a
           className="text-sm text-neutral-900 dark:text-neutral-200"
