@@ -9,7 +9,7 @@ import axios from "axios";
 
 const BarChart = () => {
   // http request json with axios
-  const [data, setData] = useState([[]]);
+  const [data, setData] = useState([]);
 
   const url: string =
     "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json";
@@ -56,16 +56,35 @@ const BarChart = () => {
 
     // console.log(new Intl.DateTimeFormat("en-US").format(data[0][0]));
 
-    data.map((el) => {
-      console.log(el[0]);
-      return el[0];
-    });
+    // data.map((el) => {
+    //   console.log(el[0]);
+    //   return el[0];
+    // });
+
+    // const test = d3
+    //   .scaleTime()
+    //   .domain(
+    //     d3.extent(data, (d) => {
+    //       // console.log(d[0]);
+
+    //       return d[0];
+    //     }),
+    //   )
+    //   .range([marginLeft, width - marginRight]);
+    // // console.log(test);
 
     // Declare the x (horizontal position) scale.
     const xScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d, i) => i)])
+      .domain(d3.extent(data, (d, i) => i))
       .range([marginLeft, width - marginRight]);
+    // console.log(xScale);
+
+    const xScaleDate = d3
+      .scaleLinear()
+      .domain(d3.extent(data, (d, i) => i))
+      .range([marginLeft, width - marginRight]);
+    // console.log(xScale);
 
     // Declare the y (vertical position) scale.
     const yScale = d3
@@ -92,6 +111,9 @@ const BarChart = () => {
 
         return p;
       })
+      .transition()
+      .ease(d3.easeCubic)
+      .duration(2500)
       .attr("fill", "currentColor")
       .attr("y", (d) => yScale(d[1] + 100))
       .attr("height", (d) => yScale(0) - yScale(d[1]))
@@ -101,27 +123,21 @@ const BarChart = () => {
     svg
       .append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(
-        d3
-          .axisBottom(xScale)
-          .tickSizeOuter(0)
-          .tickFormat((xScale) => {
-            // console.log(
-            //   new Intl.NumberFormat("en-US", {
-            //     currency: "USD",
-            //     style: "currency",
-            //   }).format(yScale),
-            // );
-
-            return new Intl.DateTimeFormat("en-US").format(xScale);
-          }),
-      )
-      .attr("id", "x-axis");
+      .transition()
+      .ease(d3.easeCubic)
+      .delay(3000)
+      .duration(2000)
+      .call(d3.axisBottom(xScale).ticks(width / 80));
+    // .call((g) => g.select(".domain").remove());
 
     // Add the y-axis and label, and remove the domain line.
     svg
       .append("g")
       .attr("transform", `translate(${marginLeft},0)`)
+      .transition()
+      .ease(d3.easePolyIn.exponent(3))
+      .delay(4500)
+      .duration(2500)
       .call(
         d3.axisLeft(yScale).tickFormat((yScale) => {
           // console.log(
@@ -138,16 +154,16 @@ const BarChart = () => {
         }),
       )
       .attr("class", "tick")
-      .call((g) => g.select(".domain").remove())
-      .call((g) =>
-        g
-          .append("text")
-          .attr("x", -marginLeft)
-          .attr("y", 10)
-          .attr("fill", "currentColor")
-          .attr("text-anchor", "start")
-          .text("↑ GDP"),
-      )
+      // .call((g) => g.select(".domain").remove())
+      // .call((g) =>
+      //   g
+      //     .append("text")
+      //     .attr("x", -marginLeft)
+      //     .attr("y", 10)
+      //     .attr("fill", "currentColor")
+      //     .attr("text-anchor", "start")
+      //     .text("↑ GDP"),
+      // )
       .attr("id", "y-axis");
   };
 
