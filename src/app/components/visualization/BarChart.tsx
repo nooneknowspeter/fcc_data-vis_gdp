@@ -9,20 +9,16 @@ import axios from "axios";
 
 const BarChart = () => {
   // http request json with axios
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<[string, number][]>([]);
 
   const url: string =
     "https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/GDP-data.json";
 
-  const fetchData = async () => {
-    const response = await axios.get(url);
-    return response.data;
-  };
-
   // data fetches when component mounts
   useEffect(() => {
     const fetchDataAsync = async () => {
-      const data = await fetchData();
+      const response = await axios.get(url);
+      const data = await response.data;
       setData(data.data);
     };
     fetchDataAsync();
@@ -32,7 +28,7 @@ const BarChart = () => {
   const height = 500;
 
   useEffect(() => {
-    createBarChart();
+    if (data.length > 0) createBarChart();
   });
 
   const createBarChart = () => {
@@ -46,13 +42,6 @@ const BarChart = () => {
 
     // select svg element
     const svg = d3.select("svg");
-
-    // tooltip
-    const tooltip = d3
-      .select("svg")
-      .append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
 
     // console.log(data[0][1]);
 
@@ -85,13 +74,15 @@ const BarChart = () => {
     // Declare the x (horizontal position) scale.
     const xScale = d3
       .scaleLinear()
-      .domain(d3.extent(data, (d, i) => i))
+      .domain(d3.extent(data, (d, i) => i) as [number, number])
       .range([marginLeft, width - marginRight]);
     // console.log(xScale);
 
     const xScaleDate = d3
       .scaleTime()
-      .domain(d3.extent(data, (d, i) => new Date(d[0])))
+      .domain(
+        d3.extent(data, (d) => new Date(d[0])) as [Date, Date], // Explicitly cast the type after filtering
+      )
       .range([marginLeft, width - marginRight]);
 
     // console.log(d3.extent(data, (d, i) => new Date(d[0])));
@@ -99,7 +90,7 @@ const BarChart = () => {
     // Declare the y (vertical position) scale.
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d) => d[1])])
+      .domain([0, d3.max(data, (d) => d[1])!]) // Use non-null assertion since we know data exists
       .range([height - marginBottom, marginTop]);
 
     // Add a rect for each bar.
@@ -121,6 +112,7 @@ const BarChart = () => {
 
         return p;
       })
+
       .transition()
       .ease(d3.easeCubic)
       .duration(2500)
@@ -137,7 +129,11 @@ const BarChart = () => {
       .ease(d3.easeCubic)
       .delay(3000)
       .duration(2000)
-      .call(d3.axisBottom(xScaleDate).tickFormat(d3.timeFormat("%Y")));
+      .call(
+        d3
+          .axisBottom(xScaleDate)
+          .tickFormat((d) => d3.timeFormat("%Y")(d as Date)),
+      );
     // .call((g) => g.select(".domain").remove());
 
     // Add the y-axis and label, and remove the domain line.
@@ -160,7 +156,7 @@ const BarChart = () => {
           return new Intl.NumberFormat("en-US", {
             currency: "USD",
             style: "currency",
-          }).format(yScale);
+          }).format(yScale as number);
         }),
       )
       .attr("class", "tick")
