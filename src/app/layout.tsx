@@ -29,6 +29,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} overflow-hidden antialiased`}
       >
         {children}
+        <script
+          src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"
+          defer
+        ></script>
       </body>
     </html>
   );

@@ -67,38 +67,40 @@ const BarChart = () => {
       .enter()
       .append("rect")
       .attr("x", (d, i) => {
-        let p = i * 1;
-        console.log("index: ", i);
-        console.log("position, x: ", p);
-        return xScale(p);
+        let p = xScale(i * 1);
+        // console.log("index: ", i);
+        // console.log("position, x: ", p);
+        return p;
       })
-      .attr("fill", "white")
+      .attr("fill", "currentColor")
       .attr("y", (d) => yScale(d[1]))
       .attr("height", (d) => yScale(0) - yScale(d[1]))
-      .attr("width", 5)
+      .attr("width", 2)
       .attr("class", "bar");
 
-    // // Add the x-axis and label.
-    // svg
-    //   .append("g")
-    //   .attr("transform", `translate(0,${height - marginBottom})`)
-    //   .call(d3.axisBottom(x).tickSizeOuter(0));
+    // Add the x-axis and label.
+    svg
+      .append("g")
+      .attr("transform", `translate(0,${height - marginBottom})`)
+      .call(d3.axisBottom(xScale).tickSizeOuter(0));
 
-    // // Add the y-axis and label, and remove the domain line.
-    // svg
-    //   .append("g")
-    //   .attr("transform", `translate(${marginLeft},0)`)
-    //   .call(d3.axisLeft(y).tickFormat((y) => (y * 100).toFixed()))
-    //   .call((g) => g.select(".domain").remove())
-    //   .call((g) =>
-    //     g
-    //       .append("text")
-    //       .attr("x", -marginLeft)
-    //       .attr("y", 10)
-    //       .attr("fill", "currentColor")
-    //       .attr("text-anchor", "start")
-    //       .text("↑ Frequency (%)"),
-    //   );
+    // Add the y-axis and label, and remove the domain line.
+    svg
+      .append("g")
+      .attr("transform", `translate(${marginLeft},0)`)
+      .call(
+        d3.axisLeft(yScale).tickFormat((yScale) => (yScale * 100).toFixed()),
+      )
+      .call((g) => g.select(".domain").remove())
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", -marginLeft)
+          .attr("y", 10)
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "start")
+          .text("↑ GDP"),
+      );
   };
 
   return (
