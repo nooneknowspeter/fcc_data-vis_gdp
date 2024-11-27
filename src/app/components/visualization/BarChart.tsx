@@ -37,21 +37,29 @@ const BarChart = () => {
 
   const createBarChart = () => {
     // margin
-    const marginTop = 20;
+    const marginTop = 40;
     const marginRight = 60;
-    const marginBottom = 20;
+    const marginBottom = 40;
     const marginLeft = 60;
 
     // select svg element
     const svg = d3.select("svg");
 
     // console.log(data[0][1]);
+
     // console.log(
     //   new Intl.NumberFormat("en-US", {
     //     currency: "USD",
     //     style: "currency",
     //   }).format(data[0][1]),
     // );
+
+    // console.log(new Intl.DateTimeFormat("en-US").format(data[0][0]));
+
+    data.map((el) => {
+      console.log(el[0]);
+      return el[0];
+    });
 
     // Declare the x (horizontal position) scale.
     const xScale = d3
@@ -77,9 +85,11 @@ const BarChart = () => {
       .attr("data-date", (d) => d[0])
       .attr("data-gdp", (d) => d[1])
       .attr("x", (d, i) => {
-        let p = xScale(i * 1);
+        const p = xScale(i * 1);
+
         // console.log("index: ", i);
         // console.log("position, x: ", p);
+
         return p;
       })
       .attr("fill", "currentColor")
@@ -91,7 +101,21 @@ const BarChart = () => {
     svg
       .append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(d3.axisBottom(xScale).tickSizeOuter(0))
+      .call(
+        d3
+          .axisBottom(xScale)
+          .tickSizeOuter(0)
+          .tickFormat((xScale) => {
+            // console.log(
+            //   new Intl.NumberFormat("en-US", {
+            //     currency: "USD",
+            //     style: "currency",
+            //   }).format(yScale),
+            // );
+
+            return new Intl.DateTimeFormat("en-US").format(xScale);
+          }),
+      )
       .attr("id", "x-axis");
 
     // Add the y-axis and label, and remove the domain line.
