@@ -32,6 +32,34 @@ const BarChart = () => {
   });
 
   const createBarChart = () => {
+    /*     console.log(data[0][1]);
+
+    console.log(
+      new Intl.NumberFormat("en-US", {
+        currency: "USD",
+        style: "currency",
+      }).format(data[0][1]),
+    );
+
+    console.log(new Intl.DateTimeFormat("en-US").format(data[0][0]));
+
+    data.map((el) => {
+      console.log(el[0]);
+      return el[0];
+    });
+
+    const test = d3
+      .scaleTime()
+      .domain(
+        d3.extent(data, (d) => {
+          // console.log(d[0]);
+
+          return d[0];
+        }),
+      )
+      .range([marginLeft, width - marginRight]);
+    // console.log(test); */
+
     // margin
     const marginTop = 40;
     const marginRight = 60;
@@ -42,34 +70,6 @@ const BarChart = () => {
 
     // select svg element
     const svg = d3.select("svg");
-
-    // console.log(data[0][1]);
-
-    // console.log(
-    //   new Intl.NumberFormat("en-US", {
-    //     currency: "USD",
-    //     style: "currency",
-    //   }).format(data[0][1]),
-    // );
-
-    // console.log(new Intl.DateTimeFormat("en-US").format(data[0][0]));
-
-    // data.map((el) => {
-    //   console.log(el[0]);
-    //   return el[0];
-    // });
-
-    // const test = d3
-    //   .scaleTime()
-    //   .domain(
-    //     d3.extent(data, (d) => {
-    //       // console.log(d[0]);
-
-    //       return d[0];
-    //     }),
-    //   )
-    //   .range([marginLeft, width - marginRight]);
-    // // console.log(test);
 
     // Declare the x (horizontal position) scale.
     const xScale = d3
@@ -160,17 +160,24 @@ const BarChart = () => {
         }),
       )
       .attr("class", "tick")
-      // .call((g) => g.select(".domain").remove())
-      // .call((g) =>
-      //   g
-      //     .append("text")
-      //     .attr("x", -marginLeft)
-      //     .attr("y", 10)
-      //     .attr("fill", "currentColor")
-      //     .attr("text-anchor", "start")
-      //     .text("↑ GDP"),
-      // )
       .attr("id", "y-axis");
+    // .call((g) => g.select(".domain").remove())
+    // .call((g) =>
+    //   g
+    //     .append("text")
+    //     .attr("x", -marginLeft)
+    //     .attr("y", 10)
+    //     .attr("fill", "currentColor")
+    //     .attr("text-anchor", "start")
+    //     .text("↑ GDP"),
+    // )
+
+    // tooltips
+    d3.select("body").append("div").attr("className", "bg-neutral-50 ");
+
+    d3.selectAll("rect").on("mouseover", (event, d) => {
+      console.log(event, d);
+    });
   };
 
   return (
@@ -182,6 +189,7 @@ const BarChart = () => {
         >
           Bar Chart Showing United States GDP 1947 - 2015
         </h1>
+
         <svg id="bar-chart" width={width} height={height}></svg>
         <a
           className="text-sm text-neutral-900 dark:text-neutral-200"
