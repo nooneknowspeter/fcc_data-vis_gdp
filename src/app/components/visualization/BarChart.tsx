@@ -42,8 +42,17 @@ const BarChart = () => {
     const marginBottom = 40;
     const marginLeft = 60;
 
+    const barWidth = 2;
+
     // select svg element
     const svg = d3.select("svg");
+
+    // tooltip
+    const tooltip = d3
+      .select("svg")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
     // console.log(data[0][1]);
 
@@ -81,10 +90,11 @@ const BarChart = () => {
     // console.log(xScale);
 
     const xScaleDate = d3
-      .scaleLinear()
-      .domain(d3.extent(data, (d, i) => i))
+      .scaleTime()
+      .domain(d3.extent(data, (d, i) => new Date(d[0])))
       .range([marginLeft, width - marginRight]);
-    // console.log(xScale);
+
+    // console.log(d3.extent(data, (d, i) => new Date(d[0])));
 
     // Declare the y (vertical position) scale.
     const yScale = d3
@@ -117,7 +127,7 @@ const BarChart = () => {
       .attr("fill", "currentColor")
       .attr("y", (d) => yScale(d[1] + 100))
       .attr("height", (d) => yScale(0) - yScale(d[1]))
-      .attr("width", 2);
+      .attr("width", barWidth);
 
     // Add the x-axis and label.
     svg
@@ -127,7 +137,7 @@ const BarChart = () => {
       .ease(d3.easeCubic)
       .delay(3000)
       .duration(2000)
-      .call(d3.axisBottom(xScale).ticks(width / 80));
+      .call(d3.axisBottom(xScaleDate).tickFormat(d3.timeFormat("%Y")));
     // .call((g) => g.select(".domain").remove());
 
     // Add the y-axis and label, and remove the domain line.
@@ -137,7 +147,7 @@ const BarChart = () => {
       .transition()
       .ease(d3.easePolyIn.exponent(3))
       .delay(4500)
-      .duration(2500)
+      .duration(2000)
       .call(
         d3.axisLeft(yScale).tickFormat((yScale) => {
           // console.log(
@@ -174,7 +184,7 @@ const BarChart = () => {
           id="title"
           className="font-bold text-neutral-900 dark:text-neutral-200"
         >
-          Chart Showing United States GDP 1947 - 2015
+          Bar Chart Showing United States GDP 1947 - 2015
         </h1>
         <svg id="bar-chart" width={width} height={height}></svg>
         <a
