@@ -93,7 +93,25 @@ const BarChart = () => {
       .domain([0, d3.max(data, (d) => d[1])!]) // Use non-null assertion since we know data exists
       .range([height - marginBottom, marginTop]);
 
-    // Add a rect for each bar.
+    const xAxis = d3
+      .axisBottom(xScaleDate)
+      .tickFormat((d) => d3.timeFormat("%Y")(d as Date));
+
+    const yAxis = d3.axisLeft(yScale).tickFormat((yScale) => {
+      // console.log(
+      //   new Intl.NumberFormat("en-US", {
+      //     currency: "USD",
+      //     style: "currency",
+      //   }).format(yScale),
+      // );
+
+      return new Intl.NumberFormat("en-US", {
+        currency: "USD",
+        style: "currency",
+      }).format(yScale as number);
+    });
+
+    // Add a rect for each bar
     svg
       .append("g")
       .selectAll("rect")
@@ -121,7 +139,7 @@ const BarChart = () => {
       .attr("height", (d) => yScale(0) - yScale(d[1]))
       .attr("width", barWidth);
 
-    // Add the x-axis and label.
+    // Add the x-axis and label
     svg
       .append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
@@ -129,14 +147,10 @@ const BarChart = () => {
       .ease(d3.easeCubic)
       .delay(3000)
       .duration(2000)
-      .call(
-        d3
-          .axisBottom(xScaleDate)
-          .tickFormat((d) => d3.timeFormat("%Y")(d as Date)),
-      );
+      .call(xAxis);
     // .call((g) => g.select(".domain").remove());
 
-    // Add the y-axis and label, and remove the domain line.
+    // Add the y-axis and label, and remove the domain line
     svg
       .append("g")
       .attr("transform", `translate(${marginLeft},0)`)
@@ -144,21 +158,7 @@ const BarChart = () => {
       .ease(d3.easePolyIn.exponent(3))
       .delay(4500)
       .duration(2000)
-      .call(
-        d3.axisLeft(yScale).tickFormat((yScale) => {
-          // console.log(
-          //   new Intl.NumberFormat("en-US", {
-          //     currency: "USD",
-          //     style: "currency",
-          //   }).format(yScale),
-          // );
-
-          return new Intl.NumberFormat("en-US", {
-            currency: "USD",
-            style: "currency",
-          }).format(yScale as number);
-        }),
-      )
+      .call(yAxis)
       .attr("class", "tick")
       .attr("id", "y-axis");
     // .call((g) => g.select(".domain").remove())
@@ -176,36 +176,35 @@ const BarChart = () => {
     const tooltip = d3
       .select("div")
       .append("div")
-      .attr("class", "tooltip absolute tooltip-open origin-center")
+      .attr(
+        "class",
+        "tooltip relative tooltip-open origin-center tooltip-bottom",
+      )
       .attr("data-theme", "black")
       .style("opacity", 0);
 
     d3.selectAll("rect")
-      .on("mouseover", (event, d, i) => {
-        // console.log("x", event.x, "y", event.y);
-
-        // const x = event.x;
+      .on("mouseover", (event: MouseEvent, d: unknown) => {
+        const dataPoint = d as [string, number]; // Explicitly cast d to the expected type
+        console.log("x", event.x, "y", event.y);
 
         tooltip.transition().duration(500).style("opacity", 0.9);
         tooltip
-          .attr("data-tip", `${d[0]}, ${d[1]} Billion`)
-          .attr("data-date", () => {
-            const date = d[0];
-            // console.log("date", date);
-            return date;
-          })
-          .attr("data-gdp", () => {
-            const gdp = d[1];
-            // console.log("gdp", gdp);
-            return gdp;
-          });
-        //   .style("transform", `translateY(${event.y - width / 1.5}px)`)
-        //   .style("transform", `translateX(${x}px)`);
-        // console.log(x);
-        // console.log("innerWidth", innerWidth);
-        // console.log("width", width);
+          .attr(
+            "data-tip",
+            `${dataPoint[0]}, ${new Intl.NumberFormat("en-US", {
+              currency: "USD",
+              style: "currency",
+            }).format(dataPoint[1])} Billion`,
+          )
+          .attr("data-date", dataPoint[0])
+          .attr("data-gdp", dataPoint[1].toString())
+          .style("transform", `translateX(${0}px)`);
+
+        console.log("innerWidth", innerWidth);
+        console.log("width", width);
       })
-      .on("mouseout", function () {
+      .on("mouseout", () => {
         tooltip.transition().duration(500).style("opacity", 0);
       });
   };
@@ -221,7 +220,7 @@ const BarChart = () => {
         </h1>
         <svg id="bar-chart" width={width} height={height}></svg>
         <a
-          className="text-sm text-neutral-900 dark:text-neutral-200"
+          className="text-sm text-neutral-900 hover:shadow-2xl dark:text-neutral-200"
           href="https://fred.stlouisfed.org/"
           target="_blank"
         >
