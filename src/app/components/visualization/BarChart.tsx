@@ -199,7 +199,8 @@ const BarChart = () => {
           )
           .attr("data-date", dataPoint[0])
           .attr("data-gdp", dataPoint[1].toString())
-          .style("transform", `translateX(${0}px)`);
+          .style("transform-origin", "center")
+          .style("transform", `translateX(${event.x - innerWidth / 2}px)`);
 
         console.log("innerWidth", innerWidth);
         console.log("width", width);
@@ -214,7 +215,7 @@ const BarChart = () => {
       <div className="flex h-screen flex-col content-center items-center justify-center">
         <h1
           id="title"
-          className="font-bold text-neutral-900 dark:text-neutral-200"
+          className="tranl tran font-bold text-neutral-900 dark:text-neutral-200"
         >
           Bar Chart Showing United States GDP 1947 - 2015
         </h1>
